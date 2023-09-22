@@ -1,4 +1,4 @@
-package org.example;
+package org.monolithic;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,24 +9,19 @@ public class Main {
     public static void main(String[] args) throws SQLException {
         connect();
         System.out.println("Hello world!");
-
         String[] options = {"\n OPTIONS",
                 "[1] Create an Event",
                 "[2] Register Participants",
                 "[3] ",
                 "[4] ",
                 "[5] ",
-
         };
-
         Scanner scanner = new Scanner(System.in);
         int option = 0;
         while (true) {
             printMenu(options);
         }
-
     }
-
     /**
      * Connect to a sample database
      */
@@ -50,7 +45,6 @@ public class Main {
             }
         }
     }
-
     public static void printMenu(String[] options){
         for (String option : options){
             System.out.println(option);
