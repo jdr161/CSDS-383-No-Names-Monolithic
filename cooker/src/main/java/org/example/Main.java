@@ -3,11 +3,28 @@ package org.example;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
         connect();
         System.out.println("Hello world!");
+
+        String[] options = {"\n OPTIONS",
+                "[1] Create an Event",
+                "[2] Register Participants",
+                "[3] ",
+                "[4] ",
+                "[5] ",
+
+        };
+
+        Scanner scanner = new Scanner(System.in);
+        int option = 0;
+        while (true) {
+            printMenu(options);
+        }
+
     }
 
     /**
@@ -32,5 +49,12 @@ public class Main {
                 System.out.println(ex.getMessage());
             }
         }
+    }
+
+    public static void printMenu(String[] options){
+        for (String option : options){
+            System.out.println(option);
+        }
+        System.out.print("Choose your option : ");
     }
 }
