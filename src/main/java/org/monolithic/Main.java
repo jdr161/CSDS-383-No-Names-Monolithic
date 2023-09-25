@@ -140,7 +140,7 @@ public class Main {
                     .description("ex desc 2")
                     .hostEmail("ex2@gmail.com")
                     .build();
-            EventDao eventDao = new EventDaoImpl();
+            EventDao eventDao = new EventDao();
             eventDao.addEvent(haha);
             eventDao.addEvent(haha2);
 
