@@ -60,7 +60,8 @@ public class MainCli {
                 default -> System.exit(0);
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.out.println(e.getMessage());
+            return CliCode.MAIN_MENU;
         }
 
         scanner.close();
