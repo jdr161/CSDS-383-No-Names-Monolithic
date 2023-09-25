@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
 
@@ -36,20 +35,14 @@ public class Main {
         setupDatabase();
         exampleDatabaseOperations();
 
-        String[] options = {"\n OPTIONS",
-                "[1] Create an Event",
-                "[2] Register Participants",
-                "[3] ",
-                "[4] ",
-                "[5] ",
-        };
-        Scanner scanner = new Scanner(System.in);
-        int option = 0;
-//        while (true) { // bro really busted my computer w this shit 💀
-//            printMenu(options);
-//        }
+        CliCode code = CliCode.MAIN_MENU;
+        while (code == CliCode.MAIN_MENU) {
+            code = MainCli.mainMenu();
+        }
 
+        System.out.println("Exiting program...");
         conn.close();
+        System.exit(0);
     }
 
     /**
@@ -158,12 +151,5 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static void printMenu(String[] options) {
-        for (String option : options) {
-            System.out.println(option);
-        }
-        System.out.print("Choose your option : ");
     }
 }
