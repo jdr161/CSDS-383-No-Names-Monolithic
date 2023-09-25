@@ -5,7 +5,8 @@ public enum CliCode {
     ERROR_REPEAT_OP(-1),
 
     MAIN_MENU(0),
-    NO_ERROR_NO_REPEAT_OP(1);
+    NO_ERROR_NO_REPEAT_OP(1),
+    CONTINUE(2);
 
     private final int code;
 
