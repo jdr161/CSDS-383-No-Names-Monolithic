@@ -11,6 +11,10 @@ import java.util.List;
 public class Main {
 
     // TODO refactor
+    private static final String CREATE_EVENTS_TABLE_SQL = """
+            create table events (
+                id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(20), description varchar(20), host_email varchar(20)
+            );""";
     private static final String CREATE_PARTICIPANTS_TABLE_SQL = """
             create table participants (
                 id uuid default random_uuid() primary key, event_id uuid, name varchar(20), email varchar(20),
@@ -57,92 +61,6 @@ public class Main {
         // create the participants table:
         try (Statement statement = conn.createStatement()) {
             statement.execute(CREATE_PARTICIPANTS_TABLE_SQL);
-        }
-    }
-
-    // TODO REMOVE THIS - THIS IS ALL JUST EXAMPLES/CONFIRMATION THAT IT WORKS:
-    private static void exampleDatabaseOperations() throws SQLException {
-        // example of adding an event row:
-        String exampleEventId;
-        Event exampleEvent = Event.builder()
-                .date("2023-09-23")
-                .time("11:00 PM")
-                .title("example title")
-                .description("example description")
-                .hostEmail("example")
-                .build();
-        try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_EVENT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, exampleEvent.getDate());
-            preparedStatement.setString(2, exampleEvent.getTime());
-            preparedStatement.setString(3, exampleEvent.getTitle());
-            preparedStatement.setString(4, exampleEvent.getDescription());
-            preparedStatement.setString(5, exampleEvent.getHostEmail());
-            preparedStatement.executeUpdate();
-
-            ResultSet res = preparedStatement.getGeneratedKeys();
-            res.next(); // TODO throw if no next.
-            exampleEventId = res.getString(1);
-        }
-
-        // example querying id of the event we added:
-        try (Statement statement = conn.createStatement()) {
-            ResultSet rs = statement.executeQuery("select * from events");
-            rs.next();
-            String id = rs.getString("id");
-            String title = rs.getString("title");
-//            System.out.printf("""
-//                            --- Successfully added event ---
-//                            Id: %s
-//                            Date: %s
-//                            Time: %s
-//                            Title: %s
-//                            Desc: %s
-//                            Host email: %s
-//                            """,
-//                    rs.getString("id"),
-//                    rs.getString("date"),
-//                    rs.getString("time"),
-//                    rs.getString("title"),
-//                    rs.getString("description"),
-//                    rs.getString("host_email"));
-        }
-
-        // example of adding a participant row, which is linked to the event we previously added:
-        try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_PARTICIPANT_SQL)) {
-            preparedStatement.setString(1, exampleEventId);
-            preparedStatement.setString(2, "time here");
-            preparedStatement.setString(3, "name here");
-            preparedStatement.setString(4, "email here");
-            preparedStatement.executeUpdate();
-        }
-
-        // This is Felix --
-        // I'm putting this here if you wanna see inserting/getting events with the Event stuff I added but otherwise I will delete later
-        try {
-            Event haha = Event.builder()
-                    .date("2023-09-23")
-                    .time("11:00 PM")
-                    .title("ex title")
-                    .description("ex desc")
-                    .hostEmail("ex@gmail.com")
-                    .build();
-            Event haha2 = Event.builder()
-                    .date("2023-09-24")
-                    .time("10:00 PM")
-                    .title("ex title 2")
-                    .description("ex desc 2")
-                    .hostEmail("ex2@gmail.com")
-                    .build();
-            EventDao eventDao = new EventDao();
-            eventDao.addEvent(haha);
-            eventDao.addEvent(haha2);
-
-            List<Event> events = eventDao.getAllEvents();
-//            for (Event e : events) {
-//                System.out.println(e);
-//            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }
