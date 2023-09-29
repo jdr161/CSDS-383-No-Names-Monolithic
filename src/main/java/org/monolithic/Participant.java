@@ -15,8 +15,6 @@ public class Participant {
 @Builder.Default
     private UUID participantId = UUID.randomUUID();
 
-    private UUID eventId;
-
     private String participantName;
 
     private String participantEmail;

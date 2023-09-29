@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -16,34 +18,15 @@ import static org.monolithic.Main.conn;
  */
 public class ParticipantDao {
 
-    public static void register(Participant participant) throws SQLException {
-        //registerIndividual(participant.getParticipantId(), participant.getEventId(), participant.getParticipantName(), participant.getParticipantEmail());
-    }
-
-    /**
-     * Allows the client to register participants to an event
-     *
-     * @param participantId         A UUID. If the UUID is not provided, a UUID will be generated for the participant
-     * @param eventId               A UUID. Links to an external site. If the UUID is not provided, a UUID will be generated for the event
-     * @param participantName       Name of the event participant, limited to 600 characters
-     * @param participantEmail      Email of the event participant.  Invalid emails will be rejected
-     */
-    private static void registerIndividual(UUID participantId, UUID eventId, String participantName, String participantEmail) throws SQLException {
-        // Invalid input detected
-        if(!isValidInputs(participantId, eventId, participantName, participantEmail))
-            return;
-
-        participantName = getParticipantName(participantName);          // 'participantName' may be too long
-
+    public static void addParticipant(Participant participant) throws SQLException {
         final String INSERT_PARTICIPANT_SQL = """
-                INSERT INTO participants (event_id, name, email) 
+                INSERT INTO participants (id ,name, email) 
                 VALUES (?, ?, ?);""";
 
-        System.out.println("My ID: " + eventId);
         try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_PARTICIPANT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setObject(1, eventId); // MIGHT NEED TO CHANGE LATER
-            preparedStatement.setString(2, participantName);
-            preparedStatement.setString(3, participantEmail);
+            preparedStatement.setObject(1, participant.getParticipantId()); // MIGHT NEED TO CHANGE LATER
+            preparedStatement.setString(2, participant.getParticipantName());
+            preparedStatement.setString(3, participant.getParticipantEmail());
             preparedStatement.executeUpdate();
 
             ResultSet res = preparedStatement.getGeneratedKeys();
@@ -51,64 +34,36 @@ public class ParticipantDao {
         }
     }
 
-    /**
-     *  Cuts off String input if too long
-     *
-     * @param participantName       the participant's given name
-     * @return                      the participant's name in the system
-     */
-    private static String getParticipantName(String participantName) {
-        return participantName.length() > 600 ? participantName.substring(0, 601) : participantName;
+    public static List<Participant> getAllParticipants() {
+        List<Participant> participantsList = new ArrayList<>();
+        final String GET_ALL_PARTICIPANTS_SQL = "SELECT * FROM participants";
+
+        try (Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery(GET_ALL_PARTICIPANTS_SQL);
+
+            while (rs.next()) {
+                participantsList.add(toParticipant(rs));
+                //Another loop here to go through participants for each participant
+                //Pull participants for each partivipant: final String GET_ALL_PARTICIPANTS_SQL = "SELECT * FROM participants";
+                //
+            }
+
+            return participantsList;
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve participants", e);
+        }
     }
 
-    /**
-     *  Returns true if email address given is valid, false if not
-     *
-     * @param participantEmail      the given email address to validate
-     * @return                      whether the email address is valid
-     */
-    private static boolean validEmail(String participantEmail) {
-        // Might need to define what a 'valid' email address is
-
-        // Check for '@'
-        int atCount = 0;
-        for(int i = 0; i < participantEmail.length(); i++) {
-            if(participantEmail.charAt(i) == '@')
-                atCount++;
+    private static Participant toParticipant(ResultSet rs) throws SQLException {
+        if (rs == null) {
+            return null;
         }
 
-        // Check for '.'
-        int dotCount = 0;
-        for(int i = 0; i < participantEmail.length(); i++) {
-            if(participantEmail.charAt(i) == '.')
-                dotCount++;
-        }
-
-        return atCount == 1 && dotCount == 1;
+        return Participant.builder()
+                .participantId(UUID.fromString(rs.getString("id")))
+                .participantName(rs.getString("name"))
+                .participantEmail(rs.getString("email"))
+                .build();
     }
 
-    /**
-     *  Determines if inputs are valid, based on assignment directions
-     *
-     * @param participantId         the participantId given
-     * @param eventId               the eventId given
-     * @param participantName       the participantName given
-     * @param participantEmail      the participantEmail given
-     * @return                      whether inputs are valid
-     */
-    private static boolean isValidInputs(UUID participantId, UUID eventId, String participantName, String participantEmail) {
-        // These null inputs are on the internal/ coder side
-        Objects.requireNonNull(participantId);
-        Objects.requireNonNull(eventId);
-        Objects.requireNonNull(participantName);
-        Objects.requireNonNull(participantEmail);
-
-        /* These next few checks are the external/ user's faults */
-
-        // Invalid email format
-        if(!validEmail(participantEmail))
-            return false;
-
-        return true;
-    }
 }
