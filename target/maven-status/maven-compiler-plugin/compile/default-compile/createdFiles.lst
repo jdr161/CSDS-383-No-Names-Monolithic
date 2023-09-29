@@ -1,0 +1,7 @@
+org/monolithic/EventDao.class
+org/monolithic/MainCli.class
+org/monolithic/Main.class
+org/monolithic/CliCode.class
+org/monolithic/Event$EventBuilder.class
+org/monolithic/utils/FormatUtils.class
+org/monolithic/Event.class

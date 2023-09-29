@@ -48,16 +48,20 @@ public class MainCli {
             clearConsole();
 
             switch (input) {
+                //View all events
                 case 1 -> {
                     return handleViewAllEventsRequest();
                 }
+                //Create an event
                 case 2 -> {
                     return handleCreateEventRequest();
                 }
+                //Register participants
                 case 3 -> {
                     // TODO
                     return CliCode.MAIN_MENU;
                 }
+                //Exit program
                 case 4 -> {
                     return CliCode.NO_ERROR_NO_REPEAT_OP;
                 }

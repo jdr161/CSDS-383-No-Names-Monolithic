@@ -11,21 +11,14 @@ import java.util.List;
 public class Main {
 
     // TODO refactor
-    private static final String CREATE_EVENTS_TABLE_SQL = """
-            create table events (
-                id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(20), description varchar(20), host_email varchar(20)
-            );""";
-    private static final String INSERT_EVENT_SQL = """
-            INSERT INTO events (date, time, title, description, host_email) 
-            VALUES (?, ?, ?, ?, ?);""";
     private static final String CREATE_PARTICIPANTS_TABLE_SQL = """
             create table participants (
-                id uuid default random_uuid() primary key, event_id uuid, time varchar(20), name varchar(20), email varchar(20),
+                id uuid default random_uuid() primary key, event_id uuid, name varchar(20), email varchar(20),
                 foreign key (event_id) references events(id)
             );""";
     private static final String INSERT_PARTICIPANT_SQL = """
-            INSERT INTO participants (event_id, time, name, email)
-            VALUES (?, ?, ?, ?);""";
+            INSERT INTO participants (event_id, name, email)
+            VALUES (?, ?, ?);""";
     // TODO refactor
     static Connection conn;
 
