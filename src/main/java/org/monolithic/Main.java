@@ -15,10 +15,17 @@ public class Main {
             create table events (
                 id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(20), description varchar(20), host_email varchar(20)
             );""";
+
     private static final String CREATE_PARTICIPANTS_TABLE_SQL = """
             create table participants (
-                id uuid default random_uuid() primary key, event_id uuid, name varchar(20), email varchar(20),
-                foreign key (event_id) references events(id)
+                id uuid default random_uuid() primary key, name varchar(20), email varchar(20)
+            );""";
+
+    private static final String CREATE_PARTICIPANT_IN_EVENT_TABLE_SQL = """
+            create table participant_in_event (
+                participant_id uuid, event_id uuid,
+                primary key (participant_id, event_id),
+                foreign key (participant_id) references participants(id), foreign key (event_id) references events(id)
             );""";
     private static final String INSERT_PARTICIPANT_SQL = """
             INSERT INTO participants (event_id, name, email)
@@ -61,6 +68,11 @@ public class Main {
         // create the participants table:
         try (Statement statement = conn.createStatement()) {
             statement.execute(CREATE_PARTICIPANTS_TABLE_SQL);
+        }
+
+        // create the participant_in_event table:
+        try (Statement statement = conn.createStatement()) {
+            statement.execute(CREATE_PARTICIPANT_IN_EVENT_TABLE_SQL);
         }
     }
 }
