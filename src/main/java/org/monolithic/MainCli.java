@@ -101,6 +101,45 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
+    //Handles the creation of a new participant as well as the validation of the input
+    private static CliCode handleCreateParticipantRequest() throws SQLException {
+        Participant participant = Participant.builder().build();
+        boolean validInput = false;
+        boolean retry = false;
+
+        System.out.println("--- New participant ---");
+        System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
+
+        System.out.print("Set a UUID for the participant, press ENTER for an auto-generated one: ");
+        scanner.nextLine();
+        while (!validInput) {
+            try {
+                if (retry) {
+                    System.out.print("Set a UUID for the participant, press ENTER for an auto-generated one: ");
+                }
+                String uuidInput = scanner.nextLine();
+                CliCode cancelFlag = checkForAndHandleCancel(uuidInput);
+                if (cancelFlag == CliCode.MAIN_MENU) {
+                    return cancelFlag;
+                }
+                if (uuidInput != null && !uuidInput.isBlank()) {
+                    participant.setParticipantId(UUID.fromString(uuidInput));
+                }
+                validInput = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Input must be a valid UUID. Try again");
+                retry = true;
+            }
+        }
+
+        validInput = false;
+        retry = false;
+
+
+    }
+
+
+    //Handles the creation of a new event as well as the validation of the input
     private static CliCode handleCreateEventRequest() throws SQLException {
         Event event = Event.builder().build();
         boolean validInput = false;
