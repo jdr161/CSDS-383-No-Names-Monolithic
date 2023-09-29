@@ -66,19 +66,52 @@ public class EventDao {
         }
     }
 
-    public void addParticipantInEvent(String participantId, String eventId) {
+    public boolean doesEventExist(String eventId) {
+        final String CHECK_EVENT_EXISTS_SQL = """
+                SELECT COUNT(1)
+                FROM events
+                WHERE id = ?;""";
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(CHECK_EVENT_EXISTS_SQL)) {
+            preparedStatement.setString(1, eventId);
+            preparedStatement.executeQuery();
+            ResultSet res = preparedStatement.getResultSet();
+            res.next();
+            boolean participantExists = res.getInt(1) == 1;
+            return participantExists;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean doesParticipantExist(String participantId) {
+        final String CHECK_PARTICIPANT_EXISTS_SQL = """
+                SELECT COUNT(1)
+                FROM participants
+                WHERE id = ?;""";
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(CHECK_PARTICIPANT_EXISTS_SQL)) {
+            preparedStatement.setString(1, participantId);
+            preparedStatement.executeQuery();
+            ResultSet res = preparedStatement.getResultSet();
+            res.next();
+            boolean participantExists = res.getInt(1) == 1;
+            return participantExists;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public void addParticipantInEvent(String participantId, String eventId) throws SQLException {
         final String INSERT_PARTICIPANT_IN_EVENT_SQL = """
                 INSERT INTO participant_in_event (participant_id, event_id) 
                 VALUES (?, ?);""";
 
-        
         try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_PARTICIPANT_IN_EVENT_SQL)) {
             preparedStatement.setString(1, participantId);
             preparedStatement.setString(2, eventId);
             preparedStatement.executeUpdate();
-        }
-        catch(SQLException e){
-
         }
     }
 

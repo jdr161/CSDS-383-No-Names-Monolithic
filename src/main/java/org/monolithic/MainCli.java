@@ -296,29 +296,75 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    private static CliCode handleRegisterParticipantRequest() throws SQLException {
+    // TODO refactor, ugly validation
+    private static CliCode handleRegisterParticipantRequest() {
         boolean validInput = false;
-        boolean retry = false;
         scanner.nextLine();
+
+        EventDao eventDao = new EventDao();
+
+        String participantUuidInput = null;
         while (!validInput) {
             try {
-                System.out.print("Enter the UUID for the event to be register: ");
-                String eventUuidInput = scanner.nextLine();
-                System.out.println(eventUuidInput);
+                System.out.print("Enter the UUID for the participant to register: ");
+                participantUuidInput = scanner.nextLine();
 
-                System.out.print("Enter the UUID for the participant to be register: ");
-                String participantUuidInput = scanner.nextLine();
-                System.out.println(participantUuidInput);
+                CliCode cancelFlag = checkForAndHandleCancel(participantUuidInput);
+                if (cancelFlag == CliCode.MAIN_MENU) {
+                    return cancelFlag;
+                }
+                if (participantUuidInput == null || participantUuidInput.isBlank()) {
+                    System.out.println("Input must be a valid UUID. Try again");
+                    continue;
+                }
 
-                EventDao eventDao = new EventDao();
-                eventDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+                UUID.fromString(participantUuidInput);
+
+                if (!eventDao.doesParticipantExist(participantUuidInput)) {
+                    System.out.println("Participant UUID doesn't exist. Try again");
+                    continue;
+                }
 
                 validInput = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Input must be a valid UUID. Try again");
             }
-            catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
+        }
+
+        String eventUuidInput = null;
+        validInput = false;
+        while (!validInput) {
+
+            try {
+                System.out.print("Enter the UUID for the event to register to: ");
+                eventUuidInput = scanner.nextLine();
+
+                CliCode cancelFlag = checkForAndHandleCancel(eventUuidInput);
+                if (cancelFlag == CliCode.MAIN_MENU) {
+                    return cancelFlag;
+                }
+                if (eventUuidInput == null || eventUuidInput.isBlank()) {
+                    System.out.println("Input must be a valid UUID. Try again");
+                    continue;
+                }
+
+                UUID.fromString(eventUuidInput);
+
+                if (!eventDao.doesEventExist(eventUuidInput)){
+                    System.out.println("Event UUID doesn't exist.");
+                    continue;
+                }
+
+                validInput = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Input must be a valid UUID. Try again");
             }
+        }
+
+        try {
+            eventDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+        } catch (SQLException e) { // should be unexpected at this point.
+            throw new RuntimeException(e);
         }
 
         System.out.println("[*] Successfully registered participant to event. Returning to main menu");
