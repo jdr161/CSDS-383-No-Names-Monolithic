@@ -66,6 +66,22 @@ public class EventDao {
         }
     }
 
+    public void addParticipantInEvent(String participantId, String eventId) {
+        final String INSERT_PARTICIPANT_IN_EVENT_SQL = """
+                INSERT INTO participant_in_event (participant_id, event_id) 
+                VALUES (?, ?);""";
+
+        
+        try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_PARTICIPANT_IN_EVENT_SQL)) {
+            preparedStatement.setString(1, participantId);
+            preparedStatement.setString(2, eventId);
+            preparedStatement.executeUpdate();
+        }
+        catch(SQLException e){
+
+        }
+    }
+
     private Event toEvent(ResultSet rs) throws SQLException {
         if (rs == null) {
             return null;

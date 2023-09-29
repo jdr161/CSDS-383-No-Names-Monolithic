@@ -58,7 +58,7 @@ public class MainCli {
                 }
                 //Register participants
                 case 3 -> {
-                    // TODO
+                    handleRegisterParticipantRequest();
                     return CliCode.MAIN_MENU;
                 }
                 //Exit program
@@ -293,6 +293,35 @@ public class MainCli {
         EventDao eventDao = new EventDao();
         eventDao.addEvent(event);
         System.out.println("[*] Successfully added event. Returning to main menu");
+        return CliCode.MAIN_MENU;
+    }
+
+    private static CliCode handleRegisterParticipantRequest() throws SQLException {
+        boolean validInput = false;
+        boolean retry = false;
+        scanner.nextLine();
+        while (!validInput) {
+            try {
+                System.out.print("Enter the UUID for the event to be register: ");
+                String eventUuidInput = scanner.nextLine();
+                System.out.println(eventUuidInput);
+
+                System.out.print("Enter the UUID for the participant to be register: ");
+                String participantUuidInput = scanner.nextLine();
+                System.out.println(participantUuidInput);
+
+                EventDao eventDao = new EventDao();
+                eventDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+
+                validInput = true;
+            }
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+                retry = true;
+            }
+        }
+
+        System.out.println("[*] Successfully registered participant to event. Returning to main menu");
         return CliCode.MAIN_MENU;
     }
 
