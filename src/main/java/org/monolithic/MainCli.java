@@ -135,7 +135,7 @@ public class MainCli {
         validInput = false;
         retry = false;
 
-
+        return CliCode.MAIN_MENU;
     }
 
 
