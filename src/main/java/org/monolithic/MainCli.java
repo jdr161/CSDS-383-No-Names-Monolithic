@@ -301,8 +301,7 @@ public class MainCli {
         boolean validInput = false;
         scanner.nextLine();
 
-        EventDao eventDao = new EventDao();
-
+        ParticipantDao participantDao = new ParticipantDao();
         String participantUuidInput = null;
         while (!validInput) {
             try {
@@ -320,7 +319,7 @@ public class MainCli {
 
                 UUID.fromString(participantUuidInput);
 
-                if (!eventDao.doesParticipantExist(participantUuidInput)) {
+                if (!participantDao.doesParticipantExist(participantUuidInput)) {
                     System.out.println("Participant UUID doesn't exist. Try again");
                     continue;
                 }
@@ -331,6 +330,7 @@ public class MainCli {
             }
         }
 
+        EventDao eventDao = new EventDao();
         String eventUuidInput = null;
         validInput = false;
         while (!validInput) {
@@ -362,7 +362,7 @@ public class MainCli {
         }
 
         try {
-            eventDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+            participantDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
         } catch (SQLException e) { // should be unexpected at this point.
             throw new RuntimeException(e);
         }
