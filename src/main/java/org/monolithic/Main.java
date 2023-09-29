@@ -30,17 +30,17 @@ public class Main {
     static Connection conn;
 
     public static void main(String[] args) throws SQLException {
-        System.out.println("Starting...");
+        //System.out.println("Starting...");
         conn = connect();
         setupDatabase();
-        exampleDatabaseOperations();
+        //exampleDatabaseOperations();
 
         CliCode code = CliCode.MAIN_MENU;
         while (code == CliCode.MAIN_MENU) {
             code = MainCli.mainMenu();
         }
 
-        System.out.println("Exiting program...");
+        //System.out.println("Exiting program...");
         conn.close();
         System.exit(0);
     }
@@ -51,7 +51,7 @@ public class Main {
     public static Connection connect() throws SQLException {
         String url = "jdbc:h2:mem:test";
         Connection conn = DriverManager.getConnection(url); // TODO conn resource leak - maybe can use try w resources?
-        System.out.println("Connection to SQLite has been established.");
+        //System.out.println("Connection to SQLite has been established.");
         return conn;
     }
 
@@ -97,21 +97,21 @@ public class Main {
             rs.next();
             String id = rs.getString("id");
             String title = rs.getString("title");
-            System.out.printf("""
-                            --- Successfully added event ---
-                            Id: %s
-                            Date: %s
-                            Time: %s
-                            Title: %s
-                            Desc: %s
-                            Host email: %s
-                            """,
-                    rs.getString("id"),
-                    rs.getString("date"),
-                    rs.getString("time"),
-                    rs.getString("title"),
-                    rs.getString("description"),
-                    rs.getString("host_email"));
+//            System.out.printf("""
+//                            --- Successfully added event ---
+//                            Id: %s
+//                            Date: %s
+//                            Time: %s
+//                            Title: %s
+//                            Desc: %s
+//                            Host email: %s
+//                            """,
+//                    rs.getString("id"),
+//                    rs.getString("date"),
+//                    rs.getString("time"),
+//                    rs.getString("title"),
+//                    rs.getString("description"),
+//                    rs.getString("host_email"));
         }
 
         // example of adding a participant row, which is linked to the event we previously added:
@@ -145,9 +145,9 @@ public class Main {
             eventDao.addEvent(haha2);
 
             List<Event> events = eventDao.getAllEvents();
-            for (Event e : events) {
-                System.out.println(e);
-            }
+//            for (Event e : events) {
+//                System.out.println(e);
+//            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
