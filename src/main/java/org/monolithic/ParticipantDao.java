@@ -17,7 +17,7 @@ import static org.monolithic.Main.conn;
 public class ParticipantDao {
 
     public static void register(Participant participant) throws SQLException {
-        registerIndividual(participant.getParticipantId(), participant.getEventId(), participant.getParticipantName(), participant.getParticipantEmail());
+        //registerIndividual(participant.getParticipantId(), participant.getEventId(), participant.getParticipantName(), participant.getParticipantEmail());
     }
 
     /**
