@@ -46,15 +46,16 @@ public class EventDao {
 
     public void addEvent(Event event) throws SQLException {
         final String INSERT_EVENT_SQL = """
-                INSERT INTO events (date, time, title, description, host_email) 
-                VALUES (?, ?, ?, ?, ?);""";
+                INSERT INTO events (id, date, time, title, description, host_email) 
+                VALUES (?, ?, ?, ?, ?, ?);""";
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(INSERT_EVENT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, event.getDate());
-            preparedStatement.setString(2, event.getTime());
-            preparedStatement.setString(3, event.getTitle());
-            preparedStatement.setString(4, event.getDescription());
-            preparedStatement.setString(5, event.getHostEmail());
+            preparedStatement.setString(1, event.getId().toString());
+            preparedStatement.setString(2, event.getDate());
+            preparedStatement.setString(3, event.getTime());
+            preparedStatement.setString(4, event.getTitle());
+            preparedStatement.setString(5, event.getDescription());
+            preparedStatement.setString(6, event.getHostEmail());
             preparedStatement.executeUpdate();
 
             ResultSet res = preparedStatement.getGeneratedKeys();
