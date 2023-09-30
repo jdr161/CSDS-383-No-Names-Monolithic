@@ -96,10 +96,14 @@ public class MainCli {
                 System.out.printf("| %-36s | %-10s | %-8s | %-50s | %-50s | %-20s |%n",
                         e.getId().toString(), e.getDate(), e.getTime(), e.getTitle().replaceAll(".{80}(?=.)", "$0\n"),
                         e.getDescription().replaceAll(".{80}(?=.)", "$0\n"), e.getHostEmail());
-                System.out.printf("--- | %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
-                for (Participant p : eventAndParticipants.getParticipantList()) {
-                    System.out.printf("--- | %-36s | %-10s | %-8s |%n",
-                            p.getParticipantId().toString(), p.getParticipantName(), p.getParticipantEmail());
+                if(eventAndParticipants.getParticipantList().isEmpty()){
+                    System.out.println("--- this event has no participants");
+                } else {
+                    System.out.printf("--- | %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
+                    for (Participant p : eventAndParticipants.getParticipantList()) {
+                        System.out.printf("--- | %-36s | %-10s | %-8s |%n",
+                                p.getParticipantId().toString(), p.getParticipantName(), p.getParticipantEmail());
+                    }
                 }
             }
             System.out.println("--------------");

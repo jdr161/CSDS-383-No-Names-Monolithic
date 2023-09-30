@@ -13,7 +13,7 @@ public class Main {
     // TODO refactor
     private static final String CREATE_EVENTS_TABLE_SQL = """
             create table events (
-                id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(20), description varchar(20), host_email varchar(20)
+                id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(50), description varchar(50), host_email varchar(20)
             );""";
 
     private static final String CREATE_PARTICIPANTS_TABLE_SQL = """
