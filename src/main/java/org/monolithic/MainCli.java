@@ -1,10 +1,7 @@
 package org.monolithic;
 
 import java.sql.SQLException;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
 public class MainCli {
     private static final Scanner scanner = new Scanner(System.in);
@@ -81,21 +78,33 @@ public class MainCli {
 
     //Option 1: View all events
     private static CliCode handleViewAllEventsRequest() {
-        List<Event> events = EventDao.getAllEvents();
+        Hashtable<UUID, EventAndParticipants> eventsAndParticipantsTable = EventAndParticipantsDao.getAllEventsAndParticipants();
+        Collection<EventAndParticipants> values = eventsAndParticipantsTable.values();
 
-        if (events == null || events.isEmpty()) {
+        if (eventsAndParticipantsTable.size() == 0) {
             System.out.println("No available events. Returning to main menu");
             System.out.println("--------------");
         } else {
+
             System.out.println("--------------");
-            System.out.println("Events");
+            System.out.println("Events and Participants");
             System.out.println("--------------");
             System.out.printf("| %-36s | %-10s | %-8s | %-50s | %-50s | %-20s |%n", "ID", "Date", "Time", "Title", "Description", "Host Email");
             System.out.println("--------------");
-            for (Event e : events) {
+            for (EventAndParticipants eventAndParticipants : values) {
+                Event e = eventAndParticipants.getEvent();
                 System.out.printf("| %-36s | %-10s | %-8s | %-50s | %-50s | %-20s |%n",
                         e.getId().toString(), e.getDate(), e.getTime(), e.getTitle().replaceAll(".{80}(?=.)", "$0\n"),
                         e.getDescription().replaceAll(".{80}(?=.)", "$0\n"), e.getHostEmail());
+                if(eventAndParticipants.getParticipantList().isEmpty()){
+                    System.out.println("--- this event has no participants");
+                } else {
+                    System.out.printf("--- | %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
+                    for (Participant p : eventAndParticipants.getParticipantList()) {
+                        System.out.printf("--- | %-36s | %-10s | %-8s |%n",
+                                p.getParticipantId().toString(), p.getParticipantName(), p.getParticipantEmail());
+                    }
+                }
             }
             System.out.println("--------------");
             System.out.println("[*] Retrieved all events");

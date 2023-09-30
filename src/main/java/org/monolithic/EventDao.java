@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.monolithic.DatabaseUtils.conn;
+import static org.monolithic.Main.conn;
 
 public class EventDao {
 
@@ -21,9 +21,6 @@ public class EventDao {
 
             while (rs.next()) {
                 eventsList.add(toEvent(rs));
-                //Another loop here to go through participants for each event
-                    //Pull participants for each event: final String GET_ALL_EVENTS_SQL = "SELECT * FROM events";
-                    //
             }
 
             return eventsList;
