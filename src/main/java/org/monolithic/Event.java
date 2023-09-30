@@ -16,12 +16,8 @@ public class Event {
     private UUID id = UUID.randomUUID();
 
     private String date;
-
     private String time;
-
     private String title;
-
     private String description;
-
     private String hostEmail;
 }

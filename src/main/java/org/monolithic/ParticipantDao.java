@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static org.monolithic.Main.conn;
@@ -66,7 +65,7 @@ public class ParticipantDao {
                 .build();
     }
 
-    public boolean doesParticipantExist(String participantId) {
+    public static boolean doesParticipantExist(String participantId) {
         final String CHECK_PARTICIPANT_EXISTS_SQL = """
                 SELECT COUNT(1)
                 FROM participants
@@ -84,7 +83,7 @@ public class ParticipantDao {
         }
     }
 
-    public void addParticipantInEvent(String participantId, String eventId) throws SQLException {
+    public static void addParticipantInEvent(String participantId, String eventId) throws SQLException {
         final String INSERT_PARTICIPANT_IN_EVENT_SQL = """
                 INSERT INTO participant_in_event (participant_id, event_id) 
                 VALUES (?, ?);""";

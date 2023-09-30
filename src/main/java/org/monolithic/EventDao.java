@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.monolithic.Main.conn;
+import static org.monolithic.DatabaseUtils.conn;
 
 public class EventDao {
 
-    public List<Event> getAllEvents() {
+    public static List<Event> getAllEvents() {
         List<Event> eventsList = new ArrayList<>();
         final String GET_ALL_EVENTS_SQL = "SELECT * FROM events";
 
@@ -32,7 +32,7 @@ public class EventDao {
         }
     }
 
-    public Event getEventById(UUID id) {
+    public static Event getEventById(UUID id) {
         final String GET_EVENT_SQL = "SELECT * FROM events WHERE id = ?";
         try (PreparedStatement preparedStatement = conn.prepareStatement(GET_EVENT_SQL)) {
             preparedStatement.setString(1, id.toString());
@@ -47,7 +47,7 @@ public class EventDao {
         return null;
     }
 
-    public void addEvent(Event event) throws SQLException {
+    public static void addEvent(Event event) throws SQLException {
         final String INSERT_EVENT_SQL = """
                 INSERT INTO events (id, date, time, title, description, host_email) 
                 VALUES (?, ?, ?, ?, ?, ?);""";
@@ -66,7 +66,7 @@ public class EventDao {
         }
     }
 
-    public boolean doesEventExist(String eventId) {
+    public static boolean doesEventExist(String eventId) {
         final String CHECK_EVENT_EXISTS_SQL = """
                 SELECT COUNT(1)
                 FROM events
@@ -85,7 +85,7 @@ public class EventDao {
         }
     }
 
-    private Event toEvent(ResultSet rs) throws SQLException {
+    private static Event toEvent(ResultSet rs) throws SQLException {
         if (rs == null) {
             return null;
         }

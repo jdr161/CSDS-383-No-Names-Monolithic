@@ -12,13 +12,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Participant {
-@Builder.Default
+    @Builder.Default
     private UUID participantId = UUID.randomUUID();
 
     private String participantName;
-
     private String participantEmail;
-
-
-
 }

@@ -1,9 +1,6 @@
 package org.monolithic;
 
-import org.monolithic.utils.FormatUtils;
-
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -71,24 +68,20 @@ public class MainCli {
                     return handleRegisterParticipantRequest();
                 }
                 // Exit program
-                case 6 -> {
+                default -> {
+                    scanner.close();
                     return CliCode.NO_ERROR_NO_REPEAT_OP;
                 }
-                default -> System.exit(0);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return CliCode.MAIN_MENU;
         }
-
-        scanner.close();
-        return CliCode.NO_ERROR_NO_REPEAT_OP;
     }
 
     //Option 1: View all events
     private static CliCode handleViewAllEventsRequest() {
-        EventDao eventDao = new EventDao();
-        List<Event> events = eventDao.getAllEvents();
+        List<Event> events = EventDao.getAllEvents();
 
         if (events == null || events.isEmpty()) {
             System.out.println("No available events. Returning to main menu");
@@ -114,156 +107,30 @@ public class MainCli {
     //Handles the creation of a new event as well as the validation of the input
     private static CliCode handleCreateEventRequest() throws SQLException {
         Event event = Event.builder().build();
-        boolean validInput = false;
-        boolean retry = false;
+        scanner.nextLine();
 
         System.out.println("--- New event ---");
         System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
 
-        System.out.print("Set a UUID for the event, press ENTER for an auto-generated one: ");
-        scanner.nextLine();
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a UUID for the event, press ENTER for an auto-generated one: ");
-                }
-                String uuidInput = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(uuidInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-                if (uuidInput != null && !uuidInput.isBlank()) {
-                    event.setId(UUID.fromString(uuidInput));
-                }
-                validInput = true;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Input must be a valid UUID. Try again");
-                retry = true;
-            }
-        }
+        CliCode result = CliInputHandlerUtils.handleUuidCreationInput("Set a UUID for the event, or press ENTER for an auto-generated one: ", event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        validInput = false;
-        retry = false;
-        System.out.print("Set a date: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a date: ");
-                }
-                String dateInput = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(dateInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-                event.setDate(FormatUtils.formatDate(dateInput));
-                validInput = true;
-            } catch (IllegalArgumentException | ParseException e) {
-                System.out.println("Input must match the format YYYY-MM-DD or be parsable into the specified format. Try again");
-                retry = true;
-            }
-        }
+        result = CliInputHandlerUtils.handleEventDateInput(event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        validInput = false;
-        retry = false;
-        System.out.print("Set a time: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a time: ");
-                }
-                String timeInput = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(timeInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-                event.setTime(FormatUtils.formatTime(timeInput));
-                validInput = true;
-            } catch (IllegalArgumentException | ParseException e) {
-                System.out.println("Input must match the format HH:MM AM/PM or be parsable into the specified format. Try again");
-                retry = true;
-            }
-        }
+        result = CliInputHandlerUtils.handleEventTimeInput(event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        validInput = false;
-        retry = false;
-        System.out.print("Set a title: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a title: ");
-                }
-                String title = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(title);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
+        result = CliInputHandlerUtils.handleEventTitleInput(event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-                if (title == null || title.length() < 1 || title.length() > 255) {
-                    throw new IllegalArgumentException("Title should be between 1 and 255 characters, inclusive. Try again");
-                } else {
-                    event.setTitle(title);
-                    validInput = true;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
-            }
+        result = CliInputHandlerUtils.handleEventDescriptionInput(event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        }
+        result = CliInputHandlerUtils.handleEmailInput("Enter the email of the event host: ", event);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        validInput = false;
-        retry = false;
-        System.out.print("Set a description: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a description: ");
-                }
-                String description = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(description);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-
-                if (description == null || description.length() < 1 || description.length() > 600) {
-                    throw new IllegalArgumentException("Title should be between 1 and 600 characters, inclusive. Try again");
-                } else {
-                    event.setDescription(description);
-                    validInput = true;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
-            }
-        }
-
-        validInput = false;
-        retry = false;
-        System.out.print("Set a host email: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a host email: ");
-                }
-                String hostEmail = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(hostEmail);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-
-                if (!FormatUtils.isValidEmail(hostEmail)) {
-                    throw new IllegalArgumentException("Invalid email. Try again");
-                } else {
-                    event.setHostEmail(hostEmail);
-                    validInput = true;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
-            }
-        }
-        EventDao eventDao = new EventDao();
-        eventDao.addEvent(event);
+        EventDao.addEvent(event);
         System.out.println("[*] Successfully added event. Returning to main menu");
         return CliCode.MAIN_MENU;
     }
@@ -276,7 +143,7 @@ public class MainCli {
             System.out.println("--------------");
         } else {
             System.out.println("--------------");
-            System.out.println("Particpants");
+            System.out.println("Participants");
             System.out.println("--------------");
             System.out.printf("| %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
             System.out.println("--------------");
@@ -293,88 +160,19 @@ public class MainCli {
     // Option 3: Register participants
     private static CliCode handleCreateParticipantRequest() throws SQLException {
         Participant participant = Participant.builder().build();
-        boolean validInput = false;
-        boolean retry = false;
+        scanner.nextLine();
 
         System.out.println("--- New participant ---");
         System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
 
-        System.out.print("Set a UUID for the participant, press ENTER for an auto-generated one: ");
-        scanner.nextLine();
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Set a UUID for the participant, press ENTER for an auto-generated one: ");
-                }
-                String uuidInput = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(uuidInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-                if (uuidInput != null && !uuidInput.isBlank()) {
-                    participant.setParticipantId(UUID.fromString(uuidInput));
-                }
-                validInput = true;
-            } catch (IllegalArgumentException e) {
-                System.out.println("Input must be a valid UUID. Try again");
-                retry = true;
-            }
-        }
+        CliCode result = CliInputHandlerUtils.handleUuidCreationInput("Set a UUID for the participant, or press ENTER for an auto-generated one: ", participant);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-        validInput = false;
-        retry = false;
+        result = CliInputHandlerUtils.handleParticipantNameInput(participant);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
-
-        System.out.print("Enter Participant Name: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Enter Participant Name: ");
-                }
-                String participantName = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(participantName);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-
-                if (participantName == null || participantName.length() < 1 || participantName.length() > 600) {
-                    throw new IllegalArgumentException("Participant name should be between 1 and 600 characters, inclusive. Try again");
-                } else {
-                    participant.setParticipantName(participantName);
-                    validInput = true;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
-            }
-
-        }
-
-        validInput = false;
-        retry = false;
-        System.out.print("Enter Participant Email: ");
-        while (!validInput) {
-            try {
-                if (retry) {
-                    System.out.print("Enter Participant Email: ");
-                }
-                String participantEmail = scanner.nextLine();
-                CliCode cancelFlag = checkForAndHandleCancel(participantEmail);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
-                }
-
-                if (!FormatUtils.isValidEmail(participantEmail)) {
-                    throw new IllegalArgumentException("Invalid email. Try again");
-                } else {
-                    participant.setParticipantEmail(participantEmail);
-                    validInput = true;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                retry = true;
-            }
-        }
+        result = CliInputHandlerUtils.handleEmailInput("Enter email of participant: ", participant);
+        if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
         ParticipantDao.addParticipant(participant);
         System.out.println("[*] Successfully added partıcıpant. Returning to main menu");
@@ -386,16 +184,16 @@ public class MainCli {
         boolean validInput = false;
         scanner.nextLine();
 
-        ParticipantDao participantDao = new ParticipantDao();
+        System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
+
         String participantUuidInput = null;
         while (!validInput) {
             try {
                 System.out.print("Enter the UUID for the participant to register: ");
                 participantUuidInput = scanner.nextLine();
 
-                CliCode cancelFlag = checkForAndHandleCancel(participantUuidInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
+                if (isCancelRequest(participantUuidInput)) {
+                    return CliCode.MAIN_MENU;
                 }
                 if (participantUuidInput == null || participantUuidInput.isBlank()) {
                     System.out.println("Input must be a valid UUID. Try again");
@@ -404,7 +202,7 @@ public class MainCli {
 
                 UUID.fromString(participantUuidInput);
 
-                if (!participantDao.doesParticipantExist(participantUuidInput)) {
+                if (!ParticipantDao.doesParticipantExist(participantUuidInput)) {
                     System.out.println("Participant UUID doesn't exist. Try again");
                     continue;
                 }
@@ -415,18 +213,15 @@ public class MainCli {
             }
         }
 
-        EventDao eventDao = new EventDao();
         String eventUuidInput = null;
         validInput = false;
         while (!validInput) {
-
             try {
                 System.out.print("Enter the UUID for the event to register to: ");
                 eventUuidInput = scanner.nextLine();
 
-                CliCode cancelFlag = checkForAndHandleCancel(eventUuidInput);
-                if (cancelFlag == CliCode.MAIN_MENU) {
-                    return cancelFlag;
+                if (isCancelRequest(eventUuidInput)) {
+                    return CliCode.MAIN_MENU;
                 }
                 if (eventUuidInput == null || eventUuidInput.isBlank()) {
                     System.out.println("Input must be a valid UUID. Try again");
@@ -435,7 +230,7 @@ public class MainCli {
 
                 UUID.fromString(eventUuidInput);
 
-                if (!eventDao.doesEventExist(eventUuidInput)){
+                if (!EventDao.doesEventExist(eventUuidInput)){
                     System.out.println("Event UUID doesn't exist.");
                     continue;
                 }
@@ -447,7 +242,7 @@ public class MainCli {
         }
 
         try {
-            participantDao.addParticipantInEvent(participantUuidInput, eventUuidInput);
+            ParticipantDao.addParticipantInEvent(participantUuidInput, eventUuidInput);
         } catch (SQLException e) { // should be unexpected at this point.
             throw new RuntimeException(e);
         }
@@ -456,11 +251,11 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    private static CliCode checkForAndHandleCancel(String input) {
+    public static boolean isCancelRequest(String input) {
         if (input != null && input.equalsIgnoreCase("c")) {
             System.out.println("[*] Cancel request successful");
-            return CliCode.MAIN_MENU;
+            return true;
         }
-        return CliCode.CONTINUE;
+        return false;
     }
 }

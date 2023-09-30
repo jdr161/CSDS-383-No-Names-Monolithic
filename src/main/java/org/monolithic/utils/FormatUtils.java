@@ -53,41 +53,4 @@ public class FormatUtils {
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormatter.format(dateFormatter.parse(date));
     }
-
-    // Testing - delete later
-    public static void main(String[] args) {
-        // good inputs
-        String validTime = "1:00 am"; // will be converted to 1:00 AM automatically
-        String validDate = "1234-9-2"; // will be converted to 1234-09-02 automatically
-        String validEmail = "example@gmail.com";
-
-        try {
-            System.out.printf("time input: %s | result: %s%n", validTime, formatTime(validTime));
-            System.out.printf("date input: %s | result: %s%n", validDate, formatDate(validDate));
-            System.out.printf("Is %s valid email: %s%n", validEmail, isValidEmail(validEmail));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
-        // invalid inputs
-        String invalidTime = "13:00 pm";
-        String invalidDate = "0120-1023-123";
-        String invalidEmail = "bad@@gma";
-
-        try {
-            formatTime(invalidTime);
-        } catch (Exception e) {
-            System.out.printf("time input: %s | result: %s%n", invalidTime, e.getMessage());
-        }
-
-        try {
-            formatDate(validDate);
-        } catch (Exception e) {
-            System.out.printf("date input: %s | result: %s%n", invalidDate, e.getMessage());
-        }
-
-        System.out.printf("Is %s valid email: %s%n", invalidEmail, isValidEmail(invalidEmail));
-
-    }
 }
