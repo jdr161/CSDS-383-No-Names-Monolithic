@@ -447,7 +447,7 @@ public class MainCli {
         }
 
         try {
-            participantDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+            participantDao.addParticipantInEvent(participantUuidInput, eventUuidInput);
         } catch (SQLException e) { // should be unexpected at this point.
             throw new RuntimeException(e);
         }
