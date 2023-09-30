@@ -42,9 +42,6 @@ public class ParticipantDao {
 
             while (rs.next()) {
                 participantsList.add(toParticipant(rs));
-                //Another loop here to go through participants for each participant
-                //Pull participants for each partivipant: final String GET_ALL_PARTICIPANTS_SQL = "SELECT * FROM participants";
-                //
             }
 
             return participantsList;
