@@ -20,7 +20,7 @@ public class EventAndParticipantsDao {
 
     public static Hashtable<UUID, EventAndParticipants> getAllEventsAndParticipants() {
         Hashtable<UUID, EventAndParticipants> eventsAndParticipantsTable = new Hashtable<UUID, EventAndParticipants>();
-        final String GET_ALL_EVENTS_AND_PARTICIPANTS_SQL = """"
+        final String GET_ALL_EVENTS_AND_PARTICIPANTS_SQL = """
                         SELECT 
                             participant_in_event.participant_id, 
                             participant.name, 
