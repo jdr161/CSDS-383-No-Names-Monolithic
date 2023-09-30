@@ -38,22 +38,23 @@ public class MainCli {
                     "[2] Create an Event",
                     "[3] Create Participants",
                     "[4] View All Participants",
-                    "[5] Exit Program"
+                    "[5] Register a Participant to an Event",
+                    "[6] Exit Program"
             };
             printMenuOptions(options);
 
             int input = scanner.nextInt();
-            if (input < 1 || input > 5)
+            if (input < 1 || input > 6)
                 throw new InputMismatchException("Incorrect input given");
 
             clearConsole();
 
             switch (input) {
-                //View all events
+                // View all events
                 case 1 -> {
                     return handleViewAllEventsRequest();
                 }
-                //Create an event
+                // Create an event
                 case 2 -> {
                     return handleCreateEventRequest();
                 }
@@ -61,12 +62,16 @@ public class MainCli {
                 case 3 -> {
                     return handleCreateParticipantRequest();
                 }
-                //View all participants
+                // View all participants
                 case 4 -> {
                     return handleViewAllParticipantsRequest();
                 }
-                //Exit program
+                // Register a participant to event
                 case 5 -> {
+                    return handleRegisterParticipantRequest();
+                }
+                // Exit program
+                case 6 -> {
                     return CliCode.NO_ERROR_NO_REPEAT_OP;
                 }
                 default -> System.exit(0);
@@ -106,7 +111,7 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    //Option 2: Create an event
+    //Handles the creation of a new event as well as the validation of the input
     private static CliCode handleCreateEventRequest() throws SQLException {
         Event event = Event.builder().build();
         boolean validInput = false;
@@ -263,7 +268,29 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    //Option 3: Register participants
+    private static CliCode handleViewAllParticipantsRequest() {
+        List<Participant> participants = ParticipantDao.getAllParticipants();
+
+        if (participants == null || participants.isEmpty()) {
+            System.out.println("No participants. Returning to main menu");
+            System.out.println("--------------");
+        } else {
+            System.out.println("--------------");
+            System.out.println("Particpants");
+            System.out.println("--------------");
+            System.out.printf("| %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
+            System.out.println("--------------");
+            for (Participant e : participants) {
+                System.out.printf("| %-36s | %-10s | %-8s |%n",
+                        e.getParticipantId().toString(), e.getParticipantName(), e.getParticipantEmail());
+            }
+            System.out.println("--------------");
+            System.out.println("[*] Retrieved all participants");
+        }
+        return CliCode.MAIN_MENU;
+    }
+
+    // Option 3: Register participants
     private static CliCode handleCreateParticipantRequest() throws SQLException {
         Participant participant = Participant.builder().build();
         boolean validInput = false;
@@ -298,11 +325,11 @@ public class MainCli {
         retry = false;
 
 
-        System.out.println("Enter Participant Name: ");
+        System.out.print("Enter Participant Name: ");
         while (!validInput) {
             try {
                 if (retry) {
-                    System.out.println("Enter Participant Name: ");
+                    System.out.print("Enter Participant Name: ");
                 }
                 String participantName = scanner.nextLine();
                 CliCode cancelFlag = checkForAndHandleCancel(participantName);
@@ -325,11 +352,11 @@ public class MainCli {
 
         validInput = false;
         retry = false;
-        System.out.println("Enter Participant Email: ");
+        System.out.print("Enter Participant Email: ");
         while (!validInput) {
             try {
                 if (retry) {
-                    System.out.println("Enter Participant Email: ");
+                    System.out.print("Enter Participant Email: ");
                 }
                 String participantEmail = scanner.nextLine();
                 CliCode cancelFlag = checkForAndHandleCancel(participantEmail);
@@ -354,26 +381,78 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    private static CliCode handleViewAllParticipantsRequest() {
-        List<Participant> participants = ParticipantDao.getAllParticipants();
+    // TODO refactor, ugly validation
+    private static CliCode handleRegisterParticipantRequest() {
+        boolean validInput = false;
+        scanner.nextLine();
 
-        if (participants == null || participants.isEmpty()) {
-            System.out.println("No participants. Returning to main menu");
-            System.out.println("--------------");
-        } else {
-            System.out.println("--------------");
-            System.out.println("Particpants");
-            System.out.println("--------------");
-            System.out.printf("| %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
-            System.out.println("--------------");
-            for (Participant e : participants) {
-                System.out.printf("| %-36s | %-10s | %-8s |%n",
-                        e.getParticipantId().toString(), e.getParticipantName(), e.getParticipantEmail());
+        ParticipantDao participantDao = new ParticipantDao();
+        String participantUuidInput = null;
+        while (!validInput) {
+            try {
+                System.out.print("Enter the UUID for the participant to register: ");
+                participantUuidInput = scanner.nextLine();
+
+                CliCode cancelFlag = checkForAndHandleCancel(participantUuidInput);
+                if (cancelFlag == CliCode.MAIN_MENU) {
+                    return cancelFlag;
+                }
+                if (participantUuidInput == null || participantUuidInput.isBlank()) {
+                    System.out.println("Input must be a valid UUID. Try again");
+                    continue;
+                }
+
+                UUID.fromString(participantUuidInput);
+
+                if (!participantDao.doesParticipantExist(participantUuidInput)) {
+                    System.out.println("Participant UUID doesn't exist. Try again");
+                    continue;
+                }
+
+                validInput = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Input must be a valid UUID. Try again");
             }
-            System.out.println("--------------");
-            System.out.println("[*] Retrieved all participants");
         }
 
+        EventDao eventDao = new EventDao();
+        String eventUuidInput = null;
+        validInput = false;
+        while (!validInput) {
+
+            try {
+                System.out.print("Enter the UUID for the event to register to: ");
+                eventUuidInput = scanner.nextLine();
+
+                CliCode cancelFlag = checkForAndHandleCancel(eventUuidInput);
+                if (cancelFlag == CliCode.MAIN_MENU) {
+                    return cancelFlag;
+                }
+                if (eventUuidInput == null || eventUuidInput.isBlank()) {
+                    System.out.println("Input must be a valid UUID. Try again");
+                    continue;
+                }
+
+                UUID.fromString(eventUuidInput);
+
+                if (!eventDao.doesEventExist(eventUuidInput)){
+                    System.out.println("Event UUID doesn't exist.");
+                    continue;
+                }
+
+                validInput = true;
+            } catch (IllegalArgumentException e) {
+                System.out.println("Input must be a valid UUID. Try again");
+            }
+        }
+
+        try {
+            participantDao.addParticipantInEvent(eventUuidInput, participantUuidInput);
+        } catch (SQLException e) { // should be unexpected at this point.
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("[*] Successfully registered participant to event. Returning to main menu");
         return CliCode.MAIN_MENU;
     }
 

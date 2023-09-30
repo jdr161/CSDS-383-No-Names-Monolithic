@@ -66,6 +66,25 @@ public class EventDao {
         }
     }
 
+    public boolean doesEventExist(String eventId) {
+        final String CHECK_EVENT_EXISTS_SQL = """
+                SELECT COUNT(1)
+                FROM events
+                WHERE id = ?;""";
+
+        try (PreparedStatement preparedStatement = conn.prepareStatement(CHECK_EVENT_EXISTS_SQL)) {
+            preparedStatement.setString(1, eventId);
+            preparedStatement.executeQuery();
+            ResultSet res = preparedStatement.getResultSet();
+            res.next();
+            boolean participantExists = res.getInt(1) == 1;
+            return participantExists;
+        }
+        catch (SQLException e) {
+            return false;
+        }
+    }
+
     private Event toEvent(ResultSet rs) throws SQLException {
         if (rs == null) {
             return null;
