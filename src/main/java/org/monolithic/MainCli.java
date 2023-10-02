@@ -37,9 +37,12 @@ public class MainCli {
             };
             printMenuOptions(options);
 
-            int input = scanner.nextInt();
-            if (input < 1 || input > 6)
-                throw new InputMismatchException("Incorrect input given");
+            int input = 0;
+            try {
+                input = Integer.parseInt(scanner.nextLine());
+            } catch (Exception e) {
+                throw new RuntimeException("Incorrect input given");
+            }
 
             clearConsole();
 
@@ -64,10 +67,13 @@ public class MainCli {
                 case 5 -> {
                     return handleRegisterParticipantRequest();
                 }
-                // Exit program
-                default -> {
+                case 6 -> {
                     scanner.close();
                     return CliCode.NO_ERROR_NO_REPEAT_OP;
+                }
+                // Exit program
+                default -> {
+                    throw new InputMismatchException("Incorrect input given");
                 }
             }
         } catch (Exception e) {
@@ -116,7 +122,6 @@ public class MainCli {
     //Handles the creation of a new event as well as the validation of the input
     private static CliCode handleCreateEventRequest() throws SQLException {
         Event event = Event.builder().build();
-        scanner.nextLine();
 
         System.out.println("--- New event ---");
         System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
@@ -169,7 +174,6 @@ public class MainCli {
     // Option 3: Register participants
     private static CliCode handleCreateParticipantRequest() throws SQLException {
         Participant participant = Participant.builder().build();
-        scanner.nextLine();
 
         System.out.println("--- New participant ---");
         System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
@@ -191,7 +195,6 @@ public class MainCli {
     // TODO refactor, ugly validation
     private static CliCode handleRegisterParticipantRequest() {
         boolean validInput = false;
-        scanner.nextLine();
 
         System.out.println("[*] Press 'C' or 'c' and then ENTER at any input prompt to cancel");
 
