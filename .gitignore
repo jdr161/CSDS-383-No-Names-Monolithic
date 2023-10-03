@@ -1,6 +1,8 @@
 .idea/
 .DS_Store
 
+!jar file/*
+!CSDS-383-No-Names-Monolithic.jar
 ### BELOW WAS COPIED FROM https://github.com/github/gitignore/blob/main/Java.gitignore
 
 # Compiled class file
