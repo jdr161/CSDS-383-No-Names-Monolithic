@@ -9,17 +9,17 @@ public class Main {
 
     // TODO refactor
     private static final String CREATE_EVENTS_TABLE_SQL = """
-            create table events (
+            create table if not exists events (
                 id uuid default random_uuid() primary key, date varchar(20), time varchar(20), title varchar(255), description varchar(600), host_email varchar(254)
             );""";
 
     private static final String CREATE_PARTICIPANTS_TABLE_SQL = """
-            create table participants (
+            create table if not exists participants (
                 id uuid default random_uuid() primary key, name varchar(600), email varchar(254)
             );""";
 
     private static final String CREATE_PARTICIPANT_IN_EVENT_TABLE_SQL = """
-            create table participant_in_event (
+            create table if not exists participant_in_event (
                 participant_id uuid, event_id uuid,
                 primary key (participant_id, event_id),
                 foreign key (participant_id) references participants(id), foreign key (event_id) references events(id)
@@ -45,7 +45,7 @@ public class Main {
      * Connect to a sample database
      */
     public static Connection connect() throws SQLException {
-        String url = "jdbc:h2:mem:test";
+        String url = "jdbc:h2:file:./csds383-monolithic-db";
         Connection conn = DriverManager.getConnection(url); // TODO conn resource leak - maybe can use try w resources?
         return conn;
     }
