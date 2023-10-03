@@ -18,11 +18,8 @@ public class MainCli {
 
     private static void clearConsole() {
         try {
-            if (System.getProperty("os.name").contains("Windows")) {
-                Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", "cls"});
-            } else {
-                Runtime.getRuntime().exec(new String[]{"clear"});
-            }
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
         } catch (Exception ignored) {
         }
     }
@@ -256,7 +253,7 @@ public class MainCli {
 
                 UUID.fromString(eventUuidInput);
 
-                if (!EventDao.doesEventExist(eventUuidInput)){
+                if (!EventDao.doesEventExist(eventUuidInput)) {
                     System.out.println("Event UUID doesn't exist.");
                     continue;
                 }
@@ -279,6 +276,7 @@ public class MainCli {
 
     /**
      * Checks if user requested to cancel the creation of an event or participant
+     *
      * @param input input received from user
      * @return true if input is equal to 'C' or 'c'; false otherwise
      */
