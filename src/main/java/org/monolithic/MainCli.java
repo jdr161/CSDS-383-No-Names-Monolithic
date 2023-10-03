@@ -92,7 +92,6 @@ public class MainCli {
     private static CliCode handleViewAllEventsRequest() {
         Hashtable<UUID, EventAndParticipants> eventsAndParticipantsTable = EventAndParticipantsDao.getAllEventsAndParticipants();
         Collection<EventAndParticipants> values = eventsAndParticipantsTable.values();
-        System.out.println(values);
 
         if (eventsAndParticipantsTable.size() == 0) {
             System.out.println("No available events. Returning to main menu");
