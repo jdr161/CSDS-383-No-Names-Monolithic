@@ -2,11 +2,8 @@ package org.monolithic;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 public class Main {
 
@@ -27,24 +24,19 @@ public class Main {
                 primary key (participant_id, event_id),
                 foreign key (participant_id) references participants(id), foreign key (event_id) references events(id)
             );""";
-    private static final String INSERT_PARTICIPANT_SQL = """
-            INSERT INTO participants (event_id, name, email)
-            VALUES (?, ?, ?);""";
+
     // TODO refactor
     static Connection conn;
 
     public static void main(String[] args) throws SQLException {
-        //System.out.println("Starting...");
         conn = connect();
         setupDatabase();
-        //exampleDatabaseOperations();
 
         CliCode code = CliCode.MAIN_MENU;
         while (code == CliCode.MAIN_MENU) {
             code = MainCli.mainMenu();
         }
 
-        //System.out.println("Exiting program...");
         conn.close();
         System.exit(0);
     }
@@ -55,7 +47,6 @@ public class Main {
     public static Connection connect() throws SQLException {
         String url = "jdbc:h2:mem:test";
         Connection conn = DriverManager.getConnection(url); // TODO conn resource leak - maybe can use try w resources?
-        //System.out.println("Connection to SQLite has been established.");
         return conn;
     }
 

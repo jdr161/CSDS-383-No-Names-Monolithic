@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class EventAndParticipants {
-    @Builder.Default
     private Event event;
     private List<Participant> participantList;
 

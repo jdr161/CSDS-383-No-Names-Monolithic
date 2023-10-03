@@ -69,11 +69,14 @@ public class MainCli {
                 case 5 -> {
                     return handleRegisterParticipantRequest();
                 }
+
+                // Exit program
                 case 6 -> {
                     scanner.close();
                     return CliCode.NO_ERROR_NO_REPEAT_OP;
                 }
-                // Exit program
+
+                // Invalid integer input
                 default -> {
                     throw new InputMismatchException("Incorrect input given");
                 }
@@ -126,7 +129,7 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    //Handles the creation of a new event as well as the validation of the input
+    // Option 2: handles the creation of a new event as well as the validation of the input
     private static CliCode handleCreateEventRequest() throws SQLException {
         Event event = Event.builder().build();
 
@@ -156,6 +159,7 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
+    // Option 4: handles viewing all participants
     private static CliCode handleViewAllParticipantsRequest() {
         List<Participant> participants = ParticipantDao.getAllParticipants();
 
@@ -181,7 +185,7 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
-    // Option 3: Register participants
+    // Option 3: Create participants
     private static CliCode handleCreateParticipantRequest() throws SQLException {
         Participant participant = Participant.builder().build();
 
@@ -202,6 +206,7 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
+    // Option 5: handles the registration of participants
     // TODO refactor, ugly validation
     private static CliCode handleRegisterParticipantRequest() {
         boolean validInput = false;
@@ -273,6 +278,11 @@ public class MainCli {
         return CliCode.MAIN_MENU;
     }
 
+    /**
+     * Checks if user requested to cancel the creation of an event or participant
+     * @param input input received from user
+     * @return true if input is equal to 'C' or 'c'; false otherwise
+     */
     public static boolean isCancelRequest(String input) {
         if (input != null && input.equalsIgnoreCase("c")) {
             System.out.println("[*] Cancel request successful");
