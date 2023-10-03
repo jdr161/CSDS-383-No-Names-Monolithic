@@ -7,7 +7,7 @@ The goal of this project was to develop an application using a monolithic archit
 - The client should be able to execute and interact with the application via a command line interface (CLI).
 - The client should be able to create events.
   - Each event should have the following attributes:
-    - Event Id: A UUIDLinks to an external site.. If the UUID is not provided, the application should generate one for the
+    - Event Id: A UUID. If the UUID is not provided, the application should generate one for the
     - event.
     - Event Date
       - The event date must follow the format: YYYY-MM-DD
