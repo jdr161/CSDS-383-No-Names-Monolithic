@@ -1,5 +1,7 @@
 package org.monolithic;
 
+import org.monolithic.utils.PrintUtils;
+
 import java.sql.SQLException;
 import java.util.*;
 
@@ -77,6 +79,7 @@ public class MainCli {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
             return CliCode.MAIN_MENU;
         }
@@ -86,33 +89,37 @@ public class MainCli {
     private static CliCode handleViewAllEventsRequest() {
         Hashtable<UUID, EventAndParticipants> eventsAndParticipantsTable = EventAndParticipantsDao.getAllEventsAndParticipants();
         Collection<EventAndParticipants> values = eventsAndParticipantsTable.values();
+        System.out.println(values);
 
         if (eventsAndParticipantsTable.size() == 0) {
             System.out.println("No available events. Returning to main menu");
             System.out.println("--------------");
         } else {
-
-            System.out.println("--------------");
+            System.out.println("-----------------------");
             System.out.println("Events and Participants");
-            System.out.println("--------------");
-            System.out.printf("| %-36s | %-10s | %-8s | %-50s | %-50s | %-20s |%n", "ID", "Date", "Time", "Title", "Description", "Host Email");
-            System.out.println("--------------");
+            List<List<String>> data = new ArrayList<>();
+            data.add(Arrays.asList("ID", "Date", "Time", "Title", "Description", "Host Email", "Participants"));
             for (EventAndParticipants eventAndParticipants : values) {
                 Event e = eventAndParticipants.getEvent();
-                System.out.printf("| %-36s | %-10s | %-8s | %-50s | %-50s | %-20s |%n",
-                        e.getId().toString(), e.getDate(), e.getTime(), e.getTitle().replaceAll(".{80}(?=.)", "$0\n"),
-                        e.getDescription().replaceAll(".{80}(?=.)", "$0\n"), e.getHostEmail());
-                if(eventAndParticipants.getParticipantList().isEmpty()){
-                    System.out.println("--- this event has no participants");
+                List<String> currentRow = new ArrayList<>(Arrays.asList(e.getId().toString(), e.getDate(), e.getTime(), e.getTitle(), e.getDescription(), e.getHostEmail()));
+                if (eventAndParticipants.getParticipantList().isEmpty()) {
+                    currentRow.add("None");
                 } else {
-                    System.out.printf("--- | %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
+                    StringBuilder participantListAggregateInfo = new StringBuilder();
                     for (Participant p : eventAndParticipants.getParticipantList()) {
-                        System.out.printf("--- | %-36s | %-10s | %-8s |%n",
+                        String participantInfo = String.format("| Id: %s, Name: %s, Email: %s |",
                                 p.getParticipantId().toString(), p.getParticipantName(), p.getParticipantEmail());
+                        participantListAggregateInfo.append(participantInfo);
                     }
+                    currentRow.add(participantListAggregateInfo.toString());
                 }
+                data.add(currentRow);
             }
-            System.out.println("--------------");
+
+            String[][] table = data.stream()
+                    .map(l -> l.toArray(String[]::new))
+                    .toArray(String[][]::new);
+            PrintUtils.prettyPrintTable(table);
             System.out.println("[*] Retrieved all events");
         }
 
@@ -156,16 +163,19 @@ public class MainCli {
             System.out.println("No participants. Returning to main menu");
             System.out.println("--------------");
         } else {
-            System.out.println("--------------");
+            System.out.println("------------");
             System.out.println("Participants");
-            System.out.println("--------------");
-            System.out.printf("| %-36s | %-10s | %-8s |%n", "ID", "Name", "Email");
-            System.out.println("--------------");
-            for (Participant e : participants) {
-                System.out.printf("| %-36s | %-10s | %-8s |%n",
-                        e.getParticipantId().toString(), e.getParticipantName(), e.getParticipantEmail());
+            List<List<String>> data = new ArrayList<>();
+            data.add(Arrays.asList("ID", "Name", "Email"));
+            for (Participant p : participants) {
+                List<String> currentRow = new ArrayList<>(Arrays.asList(p.getParticipantId().toString(), p.getParticipantName(), p.getParticipantEmail()));
+                data.add(currentRow);
             }
-            System.out.println("--------------");
+
+            String[][] table = data.stream()
+                    .map(l -> l.toArray(String[]::new))
+                    .toArray(String[][]::new);
+            PrintUtils.prettyPrintTable(table);
             System.out.println("[*] Retrieved all participants");
         }
         return CliCode.MAIN_MENU;
@@ -188,7 +198,7 @@ public class MainCli {
         if (result != CliCode.CONTINUE) return CliCode.MAIN_MENU;
 
         ParticipantDao.addParticipant(participant);
-        System.out.println("[*] Successfully added partıcıpant. Returning to main menu");
+        System.out.println("[*] Successfully added participant. Returning to main menu");
         return CliCode.MAIN_MENU;
     }
 
